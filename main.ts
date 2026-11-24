@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 const LINE =
@@ -18,3 +18,9 @@ if (LINE.trim().length === 0) {
 const outDir = process.env.MAKEFUN_OUTPUT_DIR ?? "/output";
 mkdirSync(outDir, { recursive: true });
 writeFileSync(join(outDir, "entry.txt"), LINE, "utf8");
+
+// Round-trip self-check: the file on disk must be byte-identical to LINE.
+const written = readFileSync(join(outDir, "entry.txt"), "utf8");
+if (written !== LINE) {
+  throw new Error("round-trip check failed: entry.txt does not match LINE");
+}
